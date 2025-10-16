@@ -19,7 +19,7 @@
 
 
         
-- hosts: outcast
+- hosts: all
   become: true
   tasks:
   
@@ -34,10 +34,19 @@
 
     - name: install apache and php for CentOS servers
       tags: rocky,http,php
-      dnf:
-        name:
-          - httpd
-          - php
-        state: latest
+      shell: dnf install httpd* -y  
       when: ansible_os_family == "RedHat"
 
+- hosts: outcast
+  become: true
+  tasks:
+
+    - name: copy html index file
+      tags: apache,html
+      copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+        
