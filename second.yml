@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+   
+    - name: install updates
+      tags: always
+      shell: dnf -y makecache && dnf -y update 
+      when: ansible_os_family == "RedHat"
+
+    - name: install updates
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes 
+      when: ansible_os_family == "Debian"
+
+
+
+        
+- hosts: outcast
+  become: true
+  tasks:
+  
+    - name: install apache and php for Ubuntu servers
+      tags: apache,apache2,ubuntu 
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_os_family == "Debian"
+
+    - name: install apache and php for CentOS servers
+      tags: rocky,http,php
+      dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_os_family == "RedHat"
+
