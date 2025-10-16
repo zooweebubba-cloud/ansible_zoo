@@ -37,6 +37,14 @@
       shell: dnf install httpd* -y  
       when: ansible_os_family == "RedHat"
 
+    - name: start httpd for rocky
+      tags: http,htppd,apache
+      service: 
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
 - hosts: outcast
   become: true
   tasks:
