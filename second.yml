@@ -6,55 +6,37 @@
    
     - name: install updates
       tags: always
-      shell: dnf -y makecache && dnf -y update 
+      shell: dnf -y makecache  
+      changed_when: false  
       when: ansible_os_family == "RedHat"
 
     - name: install updates
       tags: always
       apt:
-        upgrade: dist
         update_cache: yes 
+      changed_when: false    
       when: ansible_os_family == "Debian"
 
-
-
-        
-- hosts: all
+- hosts: all 
   become: true
   tasks:
+
+    - name: add ssh key for salt
+      tags: always 
+      authorized_key:
+        user: salt
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIECKxuKZfLe4bTct23PTDuzq2ITqu54PP0k0KeGR4g4 zooweebubba@ansible-host" 
+    
+          
+- hosts: all
+  become: true
+  roles:
+    - base
   
-    - name: install apache and php for Ubuntu servers
-      tags: apache,apache2,ubuntu 
-      apt:
-        name:
-          - apache2
-          - libapache2-mod-php
-        state: latest
-      when: ansible_os_family == "Debian"
-
-    - name: install apache and php for CentOS servers
-      tags: rocky,http,php
-      shell: dnf install httpd* -y  
-      when: ansible_os_family == "RedHat"
-
-    - name: start httpd for rocky
-      tags: http,htppd,apache
-      service: 
-        name: httpd
-        state: started
-        enabled: yes
-      when: ansible_os_family == "RedHat"
 
 - hosts: outcast
   become: true
-  tasks:
+  roles:
+    - outcast
 
-    - name: copy html index file
-      tags: apache,html
-      copy:
-        src: default_site.html
-        dest: /var/www/html/index.html
-        owner: root
-        group: root
-        mode: '0644'
         
