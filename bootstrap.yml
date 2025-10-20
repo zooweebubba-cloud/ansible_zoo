@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+   
+    - name: install updates
+      tags: always
+      shell: dnf -y makecache && dnf -y update 
+      when: ansible_os_family == "RedHat"
+
+    - name: install updates
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes 
+      when: ansible_os_family == "Debian"
+
+- hosts: all 
+  become: true
+  tasks:
+
+    - name: create user called salt
+      tags: always
+      user: 
+        name: salt
+        groups: root 
+    
+    - name: add ssh key for salt
+      tags: always 
+      authorized_key:
+        user: salt
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIECKxuKZfLe4bTct23PTDuzq2ITqu54PP0k0KeGR4g4 zooweebubba@ansible-host" 
+    
+    - name: add sudoers file for salt 
+      tags: always
+      copy:      
+        src: sudoer_salt
+        dest: /etc/sudoers.d/salt
+        owner: root
+        group: root
+        mode: 0440  
+          
